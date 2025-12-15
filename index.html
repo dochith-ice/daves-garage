@@ -8,10 +8,11 @@
   <link rel="stylesheet" href="style.css" />
   <meta name="theme-color" content="#0b0f18" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Dave's Garage" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Dave's Garage" />
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#0b0f18">
   <!-- PWA (optional, comes later) -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -235,6 +236,16 @@
 
           <label class="label">Beschreibung</label>
           <textarea class="input" id="jobDesc" rows="3" placeholder="Kurz beschreiben…"></textarea>
+
+          <label class="sr-only" for="jobCustomer">Kunde (optional)</label>
+          <select id="jobCustomer" class="select">
+         <option value="">— Kunde (optional) —</option>
+        </select>
+
+<label class="sr-only" for="jobVehicle">Fahrzeug (optional)</label>
+<select id="jobVehicle" class="select">
+  <option value="">— Fahrzeug (optional) —</option>
+</select>
 
           <label class="label">Status</label>
           <select class="input" id="jobStatus">

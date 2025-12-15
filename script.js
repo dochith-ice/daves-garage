@@ -77,6 +77,9 @@ const jobList = $("#jobList");
 const emptyJobs = $("#emptyJobs");
 const filterStatus = $("#filterStatus");
 
+const jobCustomer = $("#jobCustomer");
+const jobVehicle = $("#jobVehicle");
+
 function renderJobs() {
   const filter = filterStatus.value;
   const shown = filter === "all" ? jobs : jobs.filter(j => j.status === filter);
@@ -98,6 +101,15 @@ function renderJobs() {
           <strong>${escapeHtml(job.title)}</strong>
           <span class="badge">${labelStatus(job.status)}</span>
         </div>
+        ${(job.customerId || job.vehicleId) ? (() => {
+          const cName = job.customerId ? customerNameById(job.customerId) : "";
+          const v = job.vehicleId ? vehicleById(job.vehicleId) : null;
+          const plate = v?.plate || "";
+          const bits = [];
+          if (cName) bits.push(`👤 ${escapeHtml(cName)}`);
+          if (plate) bits.push(`🚗 ${escapeHtml(plate)}`);
+          return `<p>${bits.join(" • ")}</p>`;
+        })() : ""}
         ${job.desc ? `<p>${escapeHtml(job.desc)}</p>` : ""}
         <div class="row" style="margin-top:10px;">
           <button class="btn" data-action="next" data-id="${job.id}">Status wechseln</button>
@@ -112,15 +124,22 @@ function renderJobs() {
 filterStatus.addEventListener("change", renderJobs);
 
 $("#jobForm").addEventListener("submit", (e) => {
+  if (jobCustomer && jobVehicle) {
+    jobCustomer.addEventListener("change", () => {
+      refreshCustomerOptions();
+    });
+  }
   e.preventDefault();
 
   const title = $("#jobTitle").value.trim();
   const desc = $("#jobDesc").value.trim();
   const status = $("#jobStatus").value;
+  const customerId = jobCustomer ? (jobCustomer.value || "") : "";
+const vehicleId = jobVehicle ? (jobVehicle.value || "") : "";
 
   if (!title) return;
 
-  jobs.push({ id: uid(), title, desc, status, createdAt: Date.now() });
+  jobs.push({ id: uid(), title, desc, status, customerId, vehicleId, createdAt: Date.now() });
   save(JOB_KEY, jobs);
   toast("Auftrag gespeichert ✅");
 
@@ -206,6 +225,9 @@ vehicleModal.addEventListener("click", (e) => { if (e.target === vehicleModal) v
 
 // Helpers
 function customerNameById(id) {
+  function vehicleById(id) {
+    return vehicles.find(x => x.id === id) || null;
+  }
   const c = customers.find(x => x.id === id);
   return c ? c.name : "Unbekannt";
 }
@@ -215,9 +237,39 @@ function countVehiclesForCustomer(customerId) {
 function normalizePlate(plate) {
   return plate.trim().toUpperCase().replace(/\s+/g, " ");
 }
+  // Job form dropdowns (optional assignment)
+  if (jobCustomer) {
+    const currentJobCustomer = jobCustomer.value || "";
+    jobCustomer.innerHTML =
+      `<option value="">— Kunde (optional) —</option>` +
+      customers
+        .slice()
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`)
+        .join("");
+    jobCustomer.value = customers.some(c => c.id === currentJobCustomer) ? currentJobCustomer : "";
+  }
 
+  if (jobVehicle) {
+    const currentJobVehicle = jobVehicle.value || "";
+    const custId = jobCustomer ? (jobCustomer.value || "") : "";
+    const pool = custId ? vehicles.filter(v => v.customerId === custId) : vehicles;
+
+    jobVehicle.innerHTML =
+      `<option value="">— Fahrzeug (optional) —</option>` +
+      pool
+        .slice()
+        .sort((a,b) => (a.plate || "").localeCompare(b.plate || ""))
+        .map(v => `<option value="${v.id}">${escapeHtml(v.plate)} • ${escapeHtml(customerNameById(v.customerId))}</option>`)
+        .join("");
+
+    jobVehicle.value = pool.some(v => v.id === currentJobVehicle) ? currentJobVehicle : "";
+  }
 // Dropdowns
 function refreshCustomerOptions() {
+  refreshApptOptions();
+
+    refreshApptOptions();
   // Vehicle form dropdown
   vehicleCustomer.innerHTML = customers
     .slice()
