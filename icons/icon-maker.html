@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dave's Garage Icon Maker</title>
+  <style>
+    body{font-family:system-ui,-apple-system; padding:20px; background:#0b0f18; color:#e9ecf6}
+    button{padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#e9ecf6; cursor:pointer; font-weight:700}
+    button:hover{filter:brightness(1.1)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    canvas{border-radius:18px; border:1px solid rgba(255,255,255,.14)}
+    .muted{opacity:.75}
+  </style>
+</head>
+<body>
+  <h1>Dave's Garage – Icon Maker</h1>
+  <p class="muted">Erstellt icon-192.png und icon-512.png (Apple-like, blau).</p>
+
+  <div class="row">
+    <button onclick="downloadIcon(192)">Download 192×192</button>
+    <button onclick="downloadIcon(512)">Download 512×512</button>
+  </div>
+
+  <p class="muted">Vorschau (512×512):</p>
+  <canvas id="c" width="512" height="512"></canvas>
+
+  <script>
+    function draw(size){
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      canvas.width = size; canvas.height = size;
+
+      // Background
+      const r = Math.round(size * 0.22);
+      ctx.clearRect(0,0,size,size);
+
+      // Rounded rect helper
+      function rr(x,y,w,h,rad){
+        ctx.beginPath();
+        ctx.moveTo(x+rad,y);
+        ctx.arcTo(x+w,y,x+w,y+h,rad);
+        ctx.arcTo(x+w,y+h,x,y+h,rad);
+        ctx.arcTo(x,y+h,x,y,rad);
+        ctx.arcTo(x,y,x+w,y,rad);
+        ctx.closePath();
+      }
+
+      // Gradient background (Apple-ish blue)
+      const g = ctx.createLinearGradient(0,0,size,size);
+      g.addColorStop(0, "#4da3ff");
+      g.addColorStop(1, "#7bbcff");
+
+      rr(0,0,size,size,r);
+      ctx.fillStyle = g;
+      ctx.fill();
+
+      // Soft highlight
+      const h = ctx.createRadialGradient(size*0.35, size*0.25, size*0.05, size*0.35, size*0.25, size*0.75);
+      h.addColorStop(0, "rgba(255,255,255,0.45)");
+      h.addColorStop(1, "rgba(255,255,255,0)");
+      rr(size*0.04,size*0.04,size*0.92,size*0.92,r*0.85);
+      ctx.fillStyle = h;
+      ctx.fill();
+
+      // “DG” monogram
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `800 ${Math.round(size*0.34)}px system-ui, -apple-system, Segoe UI`;
+
+      ctx.fillText("DG", size/2, size*0.52);
+
+      // Tiny subtitle
+      ctx.fillStyle = "rgba(255,255,255,0.78)";
+      ctx.font = `700 ${Math.round(size*0.06)}px system-ui, -apple-system`;
+      ctx.fillText("DAVE'S GARAGE", size/2, size*0.72);
+
+      return canvas;
+    }
+
+    function downloadIcon(size){
+      const canvas = draw(size);
+      const a = document.createElement("a");
+      a.download = `icon-${size}.png`;
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+    }
+
+    // initial preview
+    draw(512);
+  </script>
+</body>
+</html>
