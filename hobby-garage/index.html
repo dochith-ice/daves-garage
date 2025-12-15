@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dave's Garage</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#0b0f18" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div>
+        <h1>Dave's Garage</h1>
+        <p class="muted">Aufträge • Kunden • Fahrzeuge • Termine</p>
+      </div>
+      <button class="icon-btn" id="newJobBtn" title="Neuer Auftrag">＋</button>
+    </header>
+
+    <!-- SHAGA HERO -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="kicker">GARAGE CONSOLE • v1.0</div>
+        <h2 class="hero-title">Dave's Garage</h2>
+        <p class="hero-sub">Übersicht über Aufträge, Kunden, Fahrzeuge und Termine – einfach, schnell und zuverlässig.</p>
+
+        <div class="hero-actions">
+          <button class="btn primary" onclick="document.querySelector('[data-tab=&quot;jobs&quot;]').click()">Aufträge</button>
+          <button class="btn" onclick="document.querySelector('[data-tab=&quot;vehicles&quot;]').click()">Kunden & Fahrzeuge</button>
+          <button class="btn" onclick="document.querySelector('[data-tab=&quot;calendar&quot;]').click()">Termine</button>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="jobs">Aufträge</button>
+      <button class="tab" data-tab="vehicles">Kunden & Fahrzeuge</button>
+      <button class="tab" data-tab="calendar">Termine</button>
+    </nav>
+
+    <main class="content">
+      <!-- AUFTRÄGE -->
+      <section id="tab-jobs" class="panel active">
+        <div class="card">
+          <div class="row">
+            <h2>Aufträge</h2>
+            <select id="filterStatus" class="select">
+              <option value="all">Alle</option>
+              <option value="offen" selected>Offen</option>
+              <option value="in-arbeit">In Arbeit</option>
+              <option value="fertig">Fertig</option>
+            </select>
+          </div>
+          <ul id="jobList" class="list"></ul>
+          <p id="emptyJobs" class="muted small">Noch keine Aufträge. Tippe auf ＋</p>
+        </div>
+      </section>
+
+      <!-- KUNDEN & FAHRZEUGE -->
+      <section id="tab-vehicles" class="panel">
+        <div class="card">
+          <div class="row">
+            <h2>Kunden</h2>
+            <button class="icon-btn" id="newCustomerBtn" title="Neuer Kunde">＋</button>
+          </div>
+
+          <ul id="customerList" class="list"></ul>
+          <p id="emptyCustomers" class="muted small">Noch keine Kunden. Tippe auf ＋</p>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="row">
+            <h2>Fahrzeuge</h2>
+            <button class="icon-btn" id="newVehicleBtn" title="Neues Fahrzeug">＋</button>
+          </div>
+
+          <div class="row">
+            <select id="vehicleCustomerFilter" class="select">
+              <option value="all">Alle Kunden</option>
+            </select>
+
+            <select id="vehicleSort" class="select">
+              <option value="newest" selected>Neueste</option>
+              <option value="plate">Nach Kennzeichen</option>
+              <option value="brand">Nach Marke</option>
+            </select>
+          </div>
+
+          <ul id="vehicleList" class="list"></ul>
+          <p id="emptyVehicles" class="muted small">Noch keine Fahrzeuge. Tippe auf ＋</p>
+        </div>
+
+        <!-- MODAL: Neuer Kunde -->
+        <div class="modal" id="customerModal">
+          <div class="sheet">
+            <div class="sheet-header">
+              <h3>Neuer Kunde</h3>
+              <button class="icon-btn" id="closeCustomerModal" title="Schliessen">✕</button>
+            </div>
+
+            <form id="customerForm">
+              <label class="label">Name</label>
+              <input class="input" id="customerName" placeholder="z.B. Max Muster" required />
+
+              <label class="label">Telefon</label>
+              <input class="input" id="customerPhone" placeholder="+41 ..." />
+
+              <label class="label">E-Mail</label>
+              <input class="input" id="customerEmail" placeholder="name@mail.ch" />
+
+              <button class="btn primary" type="submit">Speichern</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- MODAL: Neues Fahrzeug -->
+        <div class="modal" id="vehicleModal">
+          <div class="sheet">
+            <div class="sheet-header">
+              <h3>Neues Fahrzeug</h3>
+              <button class="icon-btn" id="closeVehicleModal" title="Schliessen">✕</button>
+            </div>
+
+            <form id="vehicleForm">
+              <label class="label">Kunde</label>
+              <select class="input" id="vehicleCustomer" required></select>
+
+              <label class="label">Kennzeichen</label>
+              <input class="input" id="vehiclePlate" placeholder="SO 123456" required />
+
+              <label class="label">Marke</label>
+              <input class="input" id="vehicleBrand" placeholder="z.B. BMW" />
+
+              <label class="label">Modell</label>
+              <input class="input" id="vehicleModel" placeholder="z.B. 320d" />
+
+              <label class="label">Baujahr (optional)</label>
+              <input class="input" id="vehicleYear" type="number" min="1950" max="2100" placeholder="z.B. 2018" />
+
+              <button class="btn primary" type="submit">Speichern</button>
+            </form>
+
+            <p class="muted small">Tipp: Kennzeichen werden automatisch gross geschrieben.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TERMINE -->
+      <section id="tab-calendar" class="panel">
+        <div class="card">
+          <div class="row">
+            <h2>Termine</h2>
+            <button class="icon-btn" id="newApptBtn" title="Neuer Termin">＋</button>
+          </div>
+
+          <div class="row">
+            <input class="input" id="apptSearch" placeholder="Suche: Kunde, Kennzeichen, Text…" />
+            <select id="apptFilter" class="select">
+              <option value="upcoming" selected>Kommende</option>
+              <option value="all">Alle</option>
+              <option value="past">Vergangene</option>
+            </select>
+          </div>
+
+          <ul id="apptList" class="list"></ul>
+          <p id="emptyAppts" class="muted small">Noch keine Termine. Tippe auf ＋</p>
+        </div>
+
+        <!-- MODAL: Neuer Termin -->
+        <div class="modal" id="apptModal">
+          <div class="sheet">
+            <div class="sheet-header">
+              <h3>Neuer Termin</h3>
+              <button class="icon-btn" id="closeApptModal" title="Schliessen">✕</button>
+            </div>
+
+            <form id="apptForm">
+              <label class="label">Datum & Zeit</label>
+              <input class="input" id="apptWhen" type="datetime-local" required />
+
+              <label class="label">Kunde (optional)</label>
+              <select class="input" id="apptCustomer">
+                <option value="">—</option>
+              </select>
+
+              <label class="label">Fahrzeug (optional)</label>
+              <select class="input" id="apptVehicle">
+                <option value="">—</option>
+              </select>
+
+              <label class="label">Titel</label>
+              <input class="input" id="apptTitle" placeholder="z.B. Reifenwechsel" required />
+
+              <label class="label">Notiz</label>
+              <textarea class="input" id="apptNote" rows="3" placeholder="Was ist geplant?"></textarea>
+
+              <button class="btn primary" type="submit">Speichern</button>
+            </form>
+
+            <p class="muted small">Speichert lokal im Browser.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- MODAL: Neuer Auftrag -->
+    <div class="modal" id="modal">
+      <div class="sheet">
+        <div class="sheet-header">
+          <h3>Neuer Auftrag</h3>
+          <button class="icon-btn" id="closeModal" title="Schliessen">✕</button>
+        </div>
+
+        <form id="jobForm">
+          <label class="label">Titel</label>
+          <input class="input" id="jobTitle" placeholder="z.B. Bremsen quietschen" required />
+
+          <label class="label">Beschreibung</label>
+          <textarea class="input" id="jobDesc" rows="3" placeholder="Kurz beschreiben…"></textarea>
+
+          <label class="label">Status</label>
+          <select class="input" id="jobStatus">
+            <option value="offen" selected>Offen</option>
+            <option value="in-arbeit">In Arbeit</option>
+            <option value="fertig">Fertig</option>
+          </select>
+
+          <button class="btn primary" type="submit">Speichern</button>
+          <button class="btn" type="button" id="clearAll">Alle Aufträge löschen</button>
+
+          <p class="muted small">Speichert lokal im Browser (nur auf diesem Gerät).</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
