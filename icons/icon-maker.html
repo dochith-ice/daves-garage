@@ -27,9 +27,11 @@
 
   <script>
     function draw(size){
-      const canvas = document.getElementById("c");
-      const ctx = canvas.getContext("2d");
-      canvas.width = size; canvas.height = size;
+      // draw on an offscreen canvas so exports don't depend on the preview canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
 
       // Background
       const r = Math.round(size * 0.22);
@@ -68,7 +70,6 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.font = `800 ${Math.round(size*0.34)}px system-ui, -apple-system, Segoe UI`;
-
       ctx.fillText("DG", size/2, size*0.52);
 
       // Tiny subtitle
@@ -81,14 +82,27 @@
 
     function downloadIcon(size){
       const canvas = draw(size);
-      const a = document.createElement("a");
-      a.download = `icon-${size}.png`;
-      a.href = canvas.toDataURL("image/png");
-      a.click();
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon-${size}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, 'image/png');
     }
 
     // initial preview
-    draw(512);
+    (function renderPreview(){
+      const preview = document.getElementById('c');
+      const ctx = preview.getContext('2d');
+      const off = draw(512);
+      ctx.clearRect(0,0,preview.width,preview.height);
+      ctx.drawImage(off, 0, 0);
+    })();
   </script>
 </body>
 </html>
